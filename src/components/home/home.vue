@@ -129,5 +129,5 @@
 						background: #d1d1d1 none repeat scroll 0 0
 		.content-wrapper
 			flex: 1
-			padding: 15px				
+			padding: 15px 35px 15px 20px
 </style>

@@ -6,6 +6,7 @@ import routes from './router/routes';
 import VueResource from 'vue-resource';
 
 import './common/css/base.styl';
+import './common/css/iconfont.css';
 import 'element-ui/lib/theme-default/index.css';
 
 Vue.use(ElementUI);
