@@ -50,15 +50,15 @@
 							<div class="usageInfo">
 								<div class="col total">
 									<div class="text">总数</div>
-									<div class="count">{{allClusterState.cpuTotalNum}}</div>
+									<div class="count">{{formateDecimal(allClusterState.cpuTotalNum)}}</div>
 								</div>
 								<div class="col used">
 									<div class="text">已用</div>
-									<div class="count">{{allClusterState.cpuUsed}}</div>
+									<div class="count">{{formateDecimal(allClusterState.cpuUsed)}}</div>
 								</div>
 								<div class="col left">
 									<div class="text">剩余</div>
-									<div class="count">{{allClusterState.cpuTotalNum-allClusterState.cpuUsed}}</div>
+									<div class="count">{{ calDecimal(allClusterState.cpuTotalNum, allClusterState.cpuUsed, "-")}}</div>
 								</div>
 							</div>
 						</div>
@@ -71,15 +71,15 @@
 							<div class="usageInfo">
 								<div class="col total">
 									<div class="text">总数</div>
-									<div class="count">{{allClusterState.memTotalNum | changeFloat}}</div>
+									<div class="count">{{formateDecimal(allClusterState.memTotalNum)}}</div>
 								</div>
 								<div class="col used">
 									<div class="text">已用</div>
-									<div class="count">{{allClusterState.memUsed | changeFloat}}</div>
+									<div class="count">{{formateDecimal(allClusterState.memUsed)}}</div>
 								</div>
 								<div class="col left">
 									<div class="text">剩余</div>
-									<div class="count">{{allClusterState.memTotalNum - allClusterState.memUsed | changeFloat }}</div>
+									<div class="count">{{calDecimal(allClusterState.memTotalNum, allClusterState.memUsed, "-")}}</div>
 								</div>
 							</div>
 						</div>
@@ -92,38 +92,53 @@
 							<div class="usageInfo">
 								<div class="col total">
 									<div class="text">总数</div>
-									<div class="count">{{allClusterState.hdTotalNum | changeFloat}}</div>
+									<div class="count">{{formateDecimal(allClusterState.hdTotalNum)}}</div>
 								</div>
 								<div class="col used">
 									<div class="text">已用</div>
-									<div class="count">{{allClusterState.hdUsed | changeFloat}}</div>
+									<div class="count">{{formateDecimal(allClusterState.hdUsed)}}</div>
 								</div>
 								<div class="col left">
 									<div class="text">剩余</div>
-									<div class="count">{{allClusterState.hdTotalNum - allClusterState.hdUsed | changeFloat }}</div>
+									<div class="count">{{calDecimal(allClusterState.hdTotalNum,allClusterState.hdUsed,"-") }}</div>
 								</div>
 							</div>
 						</div>
 					</div>	
+				</div></div>
+			<div class="clusterInfoCharts">
+				<div class="infoChartWrapper">
+					<v-chart ref='cpuChart'></v-chart>
 				</div>
-			<div></div>
+				<div class="infoChartWrapper">
+					<v-chart ref='memChart'></v-chart>
+				</div>
+				<div class="infoChartWrapper">
+					<v-chart ref='hdChart'></v-chart>
+				</div>
+			</div>
 			<div></div>
 		</div>
 	</div>	
 </template>
 <script>
+	import Chart from 'components/chart/chart';
+
 	const QUERY_CLUSTER_URL = 'ccmp-center/clusterModule/queryCluster.do';
 	const QUERY_ALL_CLUSTER_STATE_URL = 'ccmp-center/monitor/queryAllClusterStat.do';
+	const QUERY_CLUSTER_CHART_DATA = 'ccmp-center/monitor/queryClusterStatById.do';
 
 	export default {
 		data() {
 			return {
 				clusters: {},
 				selectedCluster: {},
-				allClusterState: {
-					memTotalNum: 0
-				}
+				allClusterState: {},
+				clusterChartData: {}
 			};
+		},
+		components: {
+			'v-chart': Chart
 		},
 		mounted() {
 			// 查询集群信息
@@ -142,32 +157,158 @@
 				});
 		},
 		watch: {
-			selectedCluster: function(selectedCluster) {
+			selectedCluster: function() {
+				this.queryAllClusterStat();
+				this.queryClusterChartData();
+			}
+		},
+		methods: {
+			// 对小数进行保留两位小数
+			formateDecimal: function(value) {
+				if (!value) {
+					return '-';
+				}
+				return Math.round(value * 100) / 100;
+			},
+			// 对小数做简单的计算
+			calDecimal: function(num1, num2, operation) {
+				if (!(typeof parseFloat(num1) === 'number' && typeof parseFloat(num2) === 'number')) {
+					return '-';
+				}
+				if (operation === '+') {
+					return (Math.round(num1 * 100) + Math.round(num2 * 100)) / 100;
+				} else if (operation === '-') {
+					return (Math.round(num1 * 100) - Math.round(num2 * 100)) / 100;
+				} else {
+					return '';
+				}
+			},
+			// 查询全部集群资源信息
+			queryAllClusterStat: function() {
 				let _this = this;
 				_this.$http.get(QUERY_ALL_CLUSTER_STATE_URL).then(
 					(res) => {
 						let response = res.body;
 						if (response.returnDto.status === true) {
 							_this.allClusterState = response.allClusterStat;
+							_this.renderClusterChart();
 						} else {
 							_this.$alert(response.returnDto.description, '查询集群资源统计信息失败', {
 								type: 'error'
 							});
 						}
 					});
-			}
-		},
-		filters: {
-			changeFloat: function(value) {
-				if (!value) {
-					return 0;
-				}
-				return Math.round(value * 100) / 100;
+			},
+			queryClusterChartData: function() {
+				let _this = this;
+				_this.$http.get(QUERY_CLUSTER_CHART_DATA + `?clusterId=${_this.selectedCluster.id}`).then(
+					(res) => {
+						let response = res.body;
+						if (response.returnDto.status === true) {
+							_this.clusterChartData = response.singleClusterStat;
+						} else {
+							_this.$alert(response.returnDto.description, '查询集群资源图表信息失败', {
+								type: 'error'
+							});
+						}
+					});
+			},
+			// 渲染集群图表
+			renderClusterChart: function() {
+				let _this = this;
+				// 饼状图option模版，避免代码过于冗余
+				let pieOptionTemp = {
+					title: {
+						// text: "总数20%",
+						top: 'center',
+						left: 'center',
+						textStyle: {
+							fontSize: 12,
+							color: '#5b626b'
+						}
+					},
+					tooltip: {
+						trigger: 'item',
+						formatter: '{a0}:{c0}'
+					},
+					// color: ["#D1D1D1", "#71a1f3"],
+					legend: {
+						left: 'center',
+						bottom: 10,
+						data: ['已使用', '未使用']
+					},
+					series: [{
+						// name: 'CPU(核)',
+						type: 'pie',
+						radius: ['30%', '50%'],
+						avoidLabelOverlap: false,
+						label: {
+							normal: {
+							show: true,
+							formatter: '{b}:\n{d}%',
+							textStyle: {
+								color: '#5b626b'
+								}
+							}
+						},
+						labelLine: {
+							normal: {
+								show: true,
+								lineStyle: {
+									color: '#5b626b'
+								}
+							}
+						},
+						data: [{
+							value: 0,
+							name: '已使用'
+						}, {
+							value: 0,
+							name: '未使用'
+						}]
+					}]
+				};
+
+				// cpu option
+				let cpuTotalNum = _this.formateDecimal(_this.clusterChartData.cpuTotalNum);
+				let cpuUsed = _this.formateDecimal(_this.clusterChartData.cpuUsed);
+				let cpuLeft = _this.calDecimal(cpuTotalNum, cpuUsed, '-');
+				pieOptionTemp.series[0].data[0].value = cpuUsed;
+				pieOptionTemp.series[0].data[1].value = cpuLeft;
+				pieOptionTemp.series[0].name = 'CPU(核)';
+				pieOptionTemp.title.text = '总数:\n' + cpuTotalNum;
+				pieOptionTemp.color = ['#71a1f3', '#c7d4e5'];
+				let cupInfoChartOption = pieOptionTemp;
+				_this.$refs.cpuChart.startRender(cupInfoChartOption);
+
+				// mem option
+				let memTotalNum = _this.formateDecimal(_this.clusterChartData.memTotalNum);
+				let memUsed = _this.formateDecimal(_this.clusterChartData.memUsed);
+				let memLeft = _this.calDecimal(memTotalNum, memUsed, '-');
+				pieOptionTemp.series[0].data[0].value = memUsed;
+				pieOptionTemp.series[0].data[1].value = memLeft;
+				pieOptionTemp.series[0].name = '内存(GB)';
+				pieOptionTemp.title.text = '总数:\n' + memTotalNum;
+				pieOptionTemp.color = ['#24c0d7', '#c7d4e5'];
+				let memInfoChartOption = pieOptionTemp;
+				_this.$refs.memChart.startRender(memInfoChartOption);
+
+				// hd option
+				let hdTotalNum = _this.formateDecimal(_this.clusterChartData.hdTotalNum);
+				let hdUsed = _this.formateDecimal(_this.clusterChartData.hdUsed);
+				let hdLeft = _this.calDecimal(hdTotalNum, hdUsed, '-');
+				pieOptionTemp.series[0].data[0].value = hdUsed;
+				pieOptionTemp.series[0].data[1].value = hdLeft;
+				pieOptionTemp.series[0].name = '存储(GB)';
+				pieOptionTemp.title.text = '总数:\n' + hdTotalNum;
+				pieOptionTemp.color = ['#5ed2ad', '#c7d4e5'];
+				let hdInfoChartOption = pieOptionTemp;
+				_this.$refs.hdChart.startRender(hdInfoChartOption);
 			}
 		}
 	};
 </script>
-<style lang="stylus" rel="stylesheet/stylus">
+<style lang='stylus' rel='stylesheet/stylus'>
 	.monitorSummary
 		.title
 			border-bottom: 1px solid #e0e0e0
@@ -254,5 +395,14 @@
 									flex: 1	
 									.text
 										color: #97a6ad		
-														
+			.clusterInfoCharts
+				display: flex
+				.infoChartWrapper
+					flex: 1
+					margin-right: 5px
+					min-width: 350px
+					height: 280px
+					border: 1px solid #eee
+					&:last-child
+						margin-right: 0										
 </style>
