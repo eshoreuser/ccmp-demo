@@ -24,6 +24,9 @@ const routes = [{
         { path: '/clusterModule', component: MonitorModule, name: '集群管理' },
         { path: '/nodeModule', component: MonitorModule, name: '节点管理' }
     ]
+}, {
+    path: '*',
+    redirect: '/login'
 }];
 
 export default routes;

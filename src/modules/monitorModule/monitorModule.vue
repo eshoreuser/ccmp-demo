@@ -124,9 +124,9 @@
 <script>
 	import Chart from 'components/chart/chart';
 
-	const QUERY_CLUSTER_URL = 'ccmp-center/clusterModule/queryCluster.do';
-	const QUERY_ALL_CLUSTER_STATE_URL = 'ccmp-center/monitor/queryAllClusterStat.do';
-	const QUERY_CLUSTER_CHART_DATA = 'ccmp-center/monitor/queryClusterStatById.do';
+	const QUERY_CLUSTER_URL = '/ccmp-center/clusterModule/queryCluster.do';
+	const QUERY_ALL_CLUSTER_STATE_URL = '/ccmp-center/monitor/queryAllClusterStat.do';
+	const QUERY_CLUSTER_CHART_DATA = '/ccmp-center/monitor/queryClusterStatById.do';
 
 	export default {
 		data() {

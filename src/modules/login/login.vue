@@ -56,6 +56,7 @@ export default {
 						.then((res) => {
 							let response = res.body;
 							if (response.returnDto.status) {
+								// TODO: 将用户信息存入session中
 								_this.$router.replace('/monitorModule');
 							} else {
 								_this.$notify.error(response.returnDto.description);
@@ -86,7 +87,7 @@ export default {
 				line-height: 80px
 				width: 50px
 				height: 50px
-				background-image: url('logo2.png')
+				background-image: url('./logo2.png')
 				background-size: 50px 50px
 			.title
 				line-height: 80px
@@ -95,7 +96,7 @@ export default {
 				font-size: 24px	
 		.login-body
 			height: 520px
-			background: #2274e6 url(login_bg.jpg) no-repeat center 0
+			background: #2274e6 url('./login_bg.jpg') no-repeat center 0
 			.form-wrapper
 				float: right
 				margin-top: 40px
@@ -111,7 +112,7 @@ export default {
 						width: 38px
 						height: 38px
 						vertical-align: top
-						background-image: url(logo.png)
+						background-image: url('./logo.png')
 						background-size: 38px, 38px
 					.text
 						line-height: 38px

@@ -89,7 +89,7 @@
 				vertical-align: top
 				width: 50px
 				height: 50px
-				background: url('logo2.png') 50px 50px
+				background: url('./logo2.png') 50px 50px
 			.text
 				line-height: 60px
 				font-size: 18px			
