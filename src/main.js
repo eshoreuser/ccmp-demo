@@ -20,7 +20,11 @@ const router = new VueRouter({
 });
 
 router.beforeEach((to, from, next) => {
-  next();
+	let roleAuthority = window.sessionStorage.getItem('roleAuthority');
+	if (!roleAuthority && to.path !== '/login') {
+		return next({path: '/login'});
+	}
+	next();
 });
 
 new Vue({

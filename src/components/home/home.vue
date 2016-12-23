@@ -40,7 +40,7 @@
 						// 将菜单信息放到session中
 						window.sessionStorage.setItem('currentMainMenu', JSON.stringify(this.currentMainMenu));
 						window.sessionStorage.setItem('currentSideMenu', JSON.stringify(this.currentSideMenu));
-						this.$router.push(this.currentSideMenu);
+						// this.$router.push(this.currentSideMenu);
 						break;
 					}
 				}
@@ -50,10 +50,16 @@
 					if (this.currentMainMenu.children[i].id === menuid) {
 						this.currentSideMenu = this.currentMainMenu.children[i];
 						window.sessionStorage.setItem('currentSideMenu', JSON.stringify(this.currentSideMenu));
-						this.$router.push(this.currentSideMenu);
+						// this.$router.push(this.currentSideMenu);
 						break;
 					}
 				}
+			}
+		},
+		watch: {
+			currentSideMenu: function() {
+				// 用路由的name属性来关联，而非具体的路径
+				this.$router.push(this.currentSideMenu);
 			}
 		},
 		created() {
