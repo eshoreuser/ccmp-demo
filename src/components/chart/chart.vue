@@ -17,14 +17,14 @@ export default {
 		// 开始渲染
 		startRender: function(option) {
 			let _this = this;
-			// _this.$nextTick(function() {
-			let chart = ECharts.init(_this.$refs.chart);
-			try {
-				chart.setOption(option);
-			} catch (e) {
-				_this.showChart = false;
-			}
-		// });
+			_this.$nextTick(function() {
+				let chart = ECharts.init(_this.$refs.chart);
+				try {
+					chart.setOption(option);
+				} catch (e) {
+					_this.showChart = false;
+				}
+			});
 		}
 	}
 };

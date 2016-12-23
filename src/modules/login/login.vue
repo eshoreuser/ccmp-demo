@@ -28,7 +28,9 @@
     </div>
 </template>
 <script>
-const LOGIN_URL = '/ccmp-center/auth/login.do?';
+import {CTX} from 'static/properties/properties.js';
+
+const LOGIN_URL = CTX + '/auth/login.do?';
 
 export default {
 	data() {
@@ -56,8 +58,18 @@ export default {
 						.then((res) => {
 							let response = res.body;
 							if (response.returnDto.status) {
-								// TODO: 将用户信息存入session中
-								_this.$router.replace('/monitorModule');
+								// 将用户信息存入session中,假设权限为roleAuthority
+								let roleAuthority = [{
+										name: '监控警报',
+										id: 1,
+										children: [{ name: '监控总览', id: 1 }, { name: '警报', id: 2 }]
+									}, {
+										name: '集群管理',
+										id: 2,
+										children: [{ name: '集群管理', id: 1 }, { name: '节点管理', id: 2 }]
+									}];
+								window.sessionStorage.setItem('roleAuthority', JSON.stringify(roleAuthority));
+								_this.$router.push('/');
 							} else {
 								_this.$notify.error(response.returnDto.description);
 							}

@@ -122,11 +122,13 @@
 	</div>	
 </template>
 <script>
+	import Utils from 'common/js/common-util';
 	import Chart from 'components/chart/chart';
+	import {CTX} from 'static/properties/properties.js';
 
-	const QUERY_CLUSTER_URL = '/ccmp-center/clusterModule/queryCluster.do';
-	const QUERY_ALL_CLUSTER_STATE_URL = '/ccmp-center/monitor/queryAllClusterStat.do';
-	const QUERY_CLUSTER_CHART_DATA = '/ccmp-center/monitor/queryClusterStatById.do';
+	const QUERY_CLUSTER_URL = CTX + '/clusterModule/queryCluster.do';
+	const QUERY_ALL_CLUSTER_STATE_URL = CTX + '/monitor/queryAllClusterStat.do';
+	const QUERY_CLUSTER_CHART_DATA = CTX + '/monitor/queryClusterStatById.do';
 
 	export default {
 		data() {
@@ -270,39 +272,39 @@
 				};
 
 				// cpu option
+				let cupInfoChartOption = Utils.deepClone(pieOptionTemp);
 				let cpuTotalNum = _this.formateDecimal(_this.clusterChartData.cpuTotalNum);
 				let cpuUsed = _this.formateDecimal(_this.clusterChartData.cpuUsed);
 				let cpuLeft = _this.calDecimal(cpuTotalNum, cpuUsed, '-');
-				pieOptionTemp.series[0].data[0].value = cpuUsed;
-				pieOptionTemp.series[0].data[1].value = cpuLeft;
-				pieOptionTemp.series[0].name = 'CPU(核)';
-				pieOptionTemp.title.text = '总数:\n' + cpuTotalNum;
-				pieOptionTemp.color = ['#71a1f3', '#c7d4e5'];
-				let cupInfoChartOption = pieOptionTemp;
+				cupInfoChartOption.series[0].data[0].value = cpuUsed;
+				cupInfoChartOption.series[0].data[1].value = cpuLeft;
+				cupInfoChartOption.series[0].name = 'CPU(核)';
+				cupInfoChartOption.title.text = '总数:\n' + cpuTotalNum;
+				cupInfoChartOption.color = ['#71a1f3', '#c7d4e5'];
 				_this.$refs.cpuChart.startRender(cupInfoChartOption);
 
 				// mem option
+				let memInfoChartOption = Utils.deepClone(pieOptionTemp);
 				let memTotalNum = _this.formateDecimal(_this.clusterChartData.memTotalNum);
 				let memUsed = _this.formateDecimal(_this.clusterChartData.memUsed);
 				let memLeft = _this.calDecimal(memTotalNum, memUsed, '-');
-				pieOptionTemp.series[0].data[0].value = memUsed;
-				pieOptionTemp.series[0].data[1].value = memLeft;
-				pieOptionTemp.series[0].name = '内存(GB)';
-				pieOptionTemp.title.text = '总数:\n' + memTotalNum;
-				pieOptionTemp.color = ['#24c0d7', '#c7d4e5'];
-				let memInfoChartOption = pieOptionTemp;
+				memInfoChartOption.series[0].data[0].value = memUsed;
+				memInfoChartOption.series[0].data[1].value = memLeft;
+				memInfoChartOption.series[0].name = '内存(GB)';
+				memInfoChartOption.title.text = '总数:\n' + memTotalNum;
+				memInfoChartOption.color = ['#24c0d7', '#c7d4e5'];
 				_this.$refs.memChart.startRender(memInfoChartOption);
 
 				// hd option
+				let hdInfoChartOption = Utils.deepClone(pieOptionTemp);
 				let hdTotalNum = _this.formateDecimal(_this.clusterChartData.hdTotalNum);
 				let hdUsed = _this.formateDecimal(_this.clusterChartData.hdUsed);
 				let hdLeft = _this.calDecimal(hdTotalNum, hdUsed, '-');
-				pieOptionTemp.series[0].data[0].value = hdUsed;
-				pieOptionTemp.series[0].data[1].value = hdLeft;
-				pieOptionTemp.series[0].name = '存储(GB)';
-				pieOptionTemp.title.text = '总数:\n' + hdTotalNum;
-				pieOptionTemp.color = ['#5ed2ad', '#c7d4e5'];
-				let hdInfoChartOption = pieOptionTemp;
+				hdInfoChartOption.series[0].data[0].value = hdUsed;
+				hdInfoChartOption.series[0].data[1].value = hdLeft;
+				hdInfoChartOption.series[0].name = '存储(GB)';
+				hdInfoChartOption.title.text = '总数:\n' + hdTotalNum;
+				hdInfoChartOption.color = ['#5ed2ad', '#c7d4e5'];
 				_this.$refs.hdChart.startRender(hdInfoChartOption);
 			}
 		}
@@ -322,9 +324,6 @@
 					margin: auto 10px
 					vertical-align: top
 					width: 100px
-				.el-select	
-					.el-input__inner
-						height: 20px
 				.text
 					font-size: 14px
 					line-height: 14px

@@ -5,7 +5,7 @@
 				<span class="logo"></span><span class="text">容器管理平台</span>
 			</div>
 			<ul class="menu-ul">
-				<li v-for="item in roleAuthority" v-if="!item.hidden" @click="clickHeadNav(item.id, $event)" :class="{ current: currentMainMenu.id === item.id}" class="menu-item">
+				<li v-for="item in roleAuthority" @click="clickHeadNav(item.id, $event)" :class="{ current: currentMainMenu.id === item.id}" class="menu-item">
 					{{item.name}}
 				</li>	
 			</ul>
@@ -25,9 +25,9 @@
 	export default {
 		data() {
 			return {
-				// 此处应该是created的时候就去查询权限的第一个菜单
 				currentMainMenu: {},
-				roleAuthority: {},
+				// 从session中获取权限对象
+				roleAuthority: JSON.parse(window.sessionStorage.getItem('roleAuthority')),
 				currentSideMenu: {}
 			};
 		},
@@ -37,45 +37,43 @@
 					if (this.roleAuthority[i].id === menuid) {
 						this.currentMainMenu = this.roleAuthority[i];
 						this.currentSideMenu = this.currentMainMenu.children[0];
+						// 将菜单信息放到session中
+						window.sessionStorage.setItem('currentMainMenu', JSON.stringify(this.currentMainMenu));
+						window.sessionStorage.setItem('currentSideMenu', JSON.stringify(this.currentSideMenu));
+						this.$router.push(this.currentSideMenu);
 						break;
 					}
 				}
-				// this.$router.push(this.currentSideMenu.path);
 			},
 			clickSideNav(menuid, event) {
 				for (var i = 0; i < this.currentMainMenu.children.length; i++) {
 					if (this.currentMainMenu.children[i].id === menuid) {
 						this.currentSideMenu = this.currentMainMenu.children[i];
+						window.sessionStorage.setItem('currentSideMenu', JSON.stringify(this.currentSideMenu));
+						this.$router.push(this.currentSideMenu);
 						break;
 					}
 				}
-				// this.$router.push(this.currentSideMenu.path);
-			}
-		},
-		watch: {
-			currentSideMenu: function() {
-				this.$router.push(this.currentSideMenu.path);
 			}
 		},
 		created() {
-			// 假设返回的权限实体为roleAuthority
-			this.roleAuthority = [{
-					name: '监控警报',
-					id: 1,
-					children: [{ name: '监控总览', id: 1, path: '/monitorModule' }, { name: '警报', id: 2, path: '/alarmModule' }]
-				}, {
-					name: '集群管理',
-					id: 2,
-					children: [{ name: '集群管理', id: 1, path: '/clusterModule' }, { name: '节点管理', id: 2, path: '/nodeModule' }]
-				}];
-			this.currentMainMenu = this.roleAuthority[0];
-			this.currentSideMenu = this.currentMainMenu.children[0];
+			// 从sessionStorage中获取当前选中的菜单信息
+			let currentMainMenu = JSON.parse(window.sessionStorage.getItem('currentMainMenu'));
+			let currentSideMenu = JSON.parse(window.sessionStorage.getItem('currentSideMenu'));
+			// 如果不存在，则默认选择第一个一级菜单的第一个二级菜单
+			if (!currentSideMenu || !currentMainMenu) {
+				this.currentMainMenu = this.roleAuthority[0];
+				this.currentSideMenu = this.currentMainMenu.children[0];
+			} else {
+				this.currentMainMenu = currentMainMenu;
+				this.currentSideMenu = currentSideMenu;
+			}
 		}
 	};
 </script>
 <style lang="stylus" rel="stylesheet/stylus" scoped>
 	.home-header
-		width: 1366px
+		width: 100%
 		height: 60px
 		background: #0475e8
 		font-size: 0
@@ -87,16 +85,18 @@
 			.logo
 				display: inline-block
 				vertical-align: top
-				width: 50px
-				height: 50px
-				background: url('./logo2.png') 50px 50px
+				margin: 5px
+				width: 42px
+				height: 40px
+				background-image: url('./logo2.png')
+				background-size: cover
 			.text
 				line-height: 60px
 				font-size: 18px			
 		.menu-ul
 			display: inline-block
 			margin-top: 24px
-			margin-left: 10px
+			margin-left: 20px
 			font-size: 16px	
 			.menu-item
 				display: inline-block
