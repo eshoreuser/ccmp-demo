@@ -40,7 +40,7 @@
 						// 将菜单信息放到session中
 						window.sessionStorage.setItem('currentMainMenu', JSON.stringify(this.currentMainMenu));
 						window.sessionStorage.setItem('currentSideMenu', JSON.stringify(this.currentSideMenu));
-						// this.$router.push(this.currentSideMenu);
+						this.$router.push(this.currentSideMenu);
 						break;
 					}
 				}
@@ -50,30 +50,26 @@
 					if (this.currentMainMenu.children[i].id === menuid) {
 						this.currentSideMenu = this.currentMainMenu.children[i];
 						window.sessionStorage.setItem('currentSideMenu', JSON.stringify(this.currentSideMenu));
-						// this.$router.push(this.currentSideMenu);
+						this.$router.push(this.currentSideMenu);
 						break;
 					}
 				}
-			}
-		},
-		watch: {
-			currentSideMenu: function() {
-				// 用路由的name属性来关联，而非具体的路径
-				this.$router.push(this.currentSideMenu);
 			}
 		},
 		created() {
 			// 从sessionStorage中获取当前选中的菜单信息
 			let currentMainMenu = JSON.parse(window.sessionStorage.getItem('currentMainMenu'));
 			let currentSideMenu = JSON.parse(window.sessionStorage.getItem('currentSideMenu'));
-			// 如果不存在，则默认选择第一个一级菜单的第一个二级菜单
+			// 如果不存在(也就是通过登录方式进来的)，则默认选择第一个一级菜单的第一个二级菜单
 			if (!currentSideMenu || !currentMainMenu) {
 				this.currentMainMenu = this.roleAuthority[0];
 				this.currentSideMenu = this.currentMainMenu.children[0];
 			} else {
+				// 否则是通过刷新进来的
 				this.currentMainMenu = currentMainMenu;
 				this.currentSideMenu = currentSideMenu;
 			}
+			this.$router.replace(this.currentSideMenu);
 		}
 	};
 </script>
