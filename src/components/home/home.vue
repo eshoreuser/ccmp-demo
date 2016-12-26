@@ -22,6 +22,7 @@
 	</div>	
 </template>
 <script>
+	// TODO: router返回的时候，currentSideMenu与currentMainMenu是不会发生变化的
 	export default {
 		data() {
 			return {
@@ -37,9 +38,6 @@
 					if (this.roleAuthority[i].id === menuid) {
 						this.currentMainMenu = this.roleAuthority[i];
 						this.currentSideMenu = this.currentMainMenu.children[0];
-						// 将菜单信息放到session中
-						window.sessionStorage.setItem('currentMainMenu', JSON.stringify(this.currentMainMenu));
-						window.sessionStorage.setItem('currentSideMenu', JSON.stringify(this.currentSideMenu));
 						this.$router.push(this.currentSideMenu);
 						break;
 					}
@@ -56,6 +54,27 @@
 				}
 			}
 		},
+		// 前进后退时设置currentSideMenu与前进后退时设置currentMainMenu与
+		watch: {
+			$route() {
+				// 遍历权限
+				for (let i = 0; i < this.roleAuthority.length; i++) {
+					let mainMenu = this.roleAuthority[i];
+					for (let j = 0; j < mainMenu.children.length; j++) {
+						let sideMenu = mainMenu.children[j];
+						if (sideMenu.name === this.$route.name) {
+							this.currentSideMenu = sideMenu;
+							this.currentMainMenu = mainMenu;
+							console.info(this.currentSideMenu);
+							// 将菜单信息放到session中
+							window.sessionStorage.setItem('currentMainMenu', JSON.stringify(this.currentMainMenu));
+							window.sessionStorage.setItem('currentSideMenu', JSON.stringify(this.currentSideMenu));
+							break;
+						}
+					}
+				}
+			}
+		},
 		created() {
 			// 从sessionStorage中获取当前选中的菜单信息
 			let currentMainMenu = JSON.parse(window.sessionStorage.getItem('currentMainMenu'));
@@ -65,7 +84,7 @@
 				this.currentMainMenu = this.roleAuthority[0];
 				this.currentSideMenu = this.currentMainMenu.children[0];
 			} else {
-				// 否则是通过刷新进来的
+				// 否则是进行了刷新操作
 				this.currentMainMenu = currentMainMenu;
 				this.currentSideMenu = currentSideMenu;
 			}

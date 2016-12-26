@@ -73,7 +73,7 @@ export default {
 							} else {
 								_this.$notify.error(response.returnDto.description);
 							}
-						});
+						}, () => (_this.$notify.error('发送请求失败')));
 				} else {
 					return false;
 				}

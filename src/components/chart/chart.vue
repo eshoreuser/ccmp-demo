@@ -20,6 +20,9 @@ export default {
 			_this.$nextTick(function() {
 				let chart = ECharts.init(_this.$refs.chart);
 				try {
+					if (!option) { // 如果页面切换太快需要渲染的组件可能已经销毁
+						return;
+					}
 					chart.setOption(option);
 				} catch (e) {
 					_this.showChart = false;
