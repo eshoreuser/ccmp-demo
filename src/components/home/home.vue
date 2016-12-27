@@ -22,7 +22,6 @@
 	</div>	
 </template>
 <script>
-	// TODO: router返回的时候，currentSideMenu与currentMainMenu是不会发生变化的
 	export default {
 		data() {
 			return {
@@ -65,7 +64,6 @@
 						if (sideMenu.name === this.$route.name) {
 							this.currentSideMenu = sideMenu;
 							this.currentMainMenu = mainMenu;
-							console.info(this.currentSideMenu);
 							// 将菜单信息放到session中
 							window.sessionStorage.setItem('currentMainMenu', JSON.stringify(this.currentMainMenu));
 							window.sessionStorage.setItem('currentSideMenu', JSON.stringify(this.currentSideMenu));

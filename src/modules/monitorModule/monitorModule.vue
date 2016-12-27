@@ -1,6 +1,6 @@
 <template>
 	<div class="monitorSummary">
-		<div class="title">监控总览</div>
+		<v-title title="监控总览"></v-title>
 		<div class="content">
 			<div class="clusterPicker">
 				<span class="text">资源池信息</span>
@@ -125,6 +125,7 @@
 	import Utils from 'common/js/common-util';
 	import Chart from 'components/chart/chart';
 	import {CTX} from 'static/properties/properties.js';
+	import title from 'components/title/title';
 
 	const QUERY_CLUSTER_URL = CTX + '/clusterModule/queryCluster.do';
 	const QUERY_ALL_CLUSTER_STATE_URL = CTX + '/monitor/queryAllClusterStat.do';
@@ -140,7 +141,8 @@
 			};
 		},
 		components: {
-			'v-chart': Chart
+			'v-chart': Chart,
+			'v-title': title
 		},
 		mounted() {
 			// 查询集群信息
@@ -281,7 +283,9 @@
 				cupInfoChartOption.series[0].name = 'CPU(核)';
 				cupInfoChartOption.title.text = '总数:\n' + cpuTotalNum;
 				cupInfoChartOption.color = ['#71a1f3', '#c7d4e5'];
-				_this.$refs.cpuChart.startRender(cupInfoChartOption);
+				if (_this.$refs.cpuChart) {
+					_this.$refs.cpuChart.startRender(cupInfoChartOption);
+				}
 
 				// mem option
 				let memInfoChartOption = Utils.deepClone(pieOptionTemp);
@@ -293,7 +297,9 @@
 				memInfoChartOption.series[0].name = '内存(GB)';
 				memInfoChartOption.title.text = '总数:\n' + memTotalNum;
 				memInfoChartOption.color = ['#24c0d7', '#c7d4e5'];
-				_this.$refs.memChart.startRender(memInfoChartOption);
+				if (_this.$refs.memChart) {
+					_this.$refs.memChart.startRender(memInfoChartOption);
+				}
 
 				// hd option
 				let hdInfoChartOption = Utils.deepClone(pieOptionTemp);
@@ -305,7 +311,9 @@
 				hdInfoChartOption.series[0].name = '存储(GB)';
 				hdInfoChartOption.title.text = '总数:\n' + hdTotalNum;
 				hdInfoChartOption.color = ['#5ed2ad', '#c7d4e5'];
-				_this.$refs.hdChart.startRender(hdInfoChartOption);
+				if (_this.$refs.hdChart) {
+					_this.$refs.hdChart.startRender(hdInfoChartOption);
+				}
 			}
 		}
 	};
